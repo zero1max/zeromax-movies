@@ -4,7 +4,7 @@ from database.db_movies import Database_Movies
 from database.db_user import Database_Users
 from aiogram.client.default import DefaultBotProperties
 
-TOKEN = "6769519460:AAHpks5wgRnyF2e8zlr7EBb6MbjeRKJL9EE"
+TOKEN = "your_token"
 
 db_movies = Database_Movies()
 db_user = Database_Users()

@@ -20,8 +20,12 @@ class Database_Users:
         self.connect.commit()
 
     def add_user(self, user_id, full_name, surname):
-        self.cursor.execute("INSERT INTO users (user_id, full_name, surname) VALUES (?, ?, ?)", (user_id, full_name, surname))
-        self.connect.commit()
+        self.cursor.execute("SELECT COUNT(*) FROM users WHERE user_id = ?", (user_id,))
+        if self.cursor.fetchone()[0] == 0:
+            self.cursor.execute("INSERT INTO users (user_id, full_name, surname) VALUES (?, ?, ?)", (user_id, full_name, surname))
+            self.connect.commit()
+        else:
+            pass
 
     def select_users(self):
         self.cursor.execute("SELECT * FROM users") 
