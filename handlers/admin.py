@@ -24,7 +24,7 @@ class Admin(Filter):
     async def __call__(self, msg: Message):
         return msg.from_user.id == self.admin_id
 
-ADMIN_ID = "ADMIN_ID"
+ADMIN_ID = 5471452269
 
 # ----------------------------------- START --------------------------------
 @router_admin.message(CommandStart(), Admin(ADMIN_ID))
@@ -48,9 +48,16 @@ async def add_movi_code(msg: Message, state: FSMContext):
 
 @router_admin.message(Movies.movi_code)
 async def movi_code_set(msg: Message, state: FSMContext):
-    await state.update_data(movi_code=msg.text)
-    await state.set_state(Movies.movi_name)
-    await msg.answer("Kino nomini yuboring!")
+    movi_code = msg.html_text
+    movie = db_movies.get_movie_by_code(movi_code)
+    
+    if movie:
+        await msg.answer(f"Bunday kino allaqachon mavjud!\n\nKino kodi: {movie['movi_code']}\nKino nomi: {movie['movi_name']}")
+        await state.clear()
+    else:
+        await state.update_data(movi_code=movi_code)
+        await state.set_state(Movies.movi_name)
+        await msg.answer("Kino nomini yuboring!")
 
 @router_admin.message(Movies.movi_name)
 async def movi_name_set(msg: Message, state: FSMContext):
