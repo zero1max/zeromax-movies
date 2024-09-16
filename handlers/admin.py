@@ -24,7 +24,7 @@ class Admin(Filter):
     async def __call__(self, msg: Message):
         return msg.from_user.id == self.admin_id
 
-ADMIN_ID = 5471452269
+ADMIN_ID = "ADMIN_ID"
 
 # ----------------------------------- START --------------------------------
 @router_admin.message(CommandStart(), Admin(ADMIN_ID))
