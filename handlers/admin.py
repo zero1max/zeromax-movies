@@ -1,11 +1,15 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import CommandStart, Command, Filter, StateFilter
 from aiogram import F
-from loader import bot, router_admin, db_movies, db_user
+from loader import bot, router_admin
+from database.db_movies import *
+from database.db_user import *
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from keyboards.defoult.defoult_key import *
 from keyboards.inline.inline_key import *
+from aiogram.types.input_file import FSInputFile
+from aiogram.enums import ChatAction
 
 class Movies(StatesGroup):
     movi_code = State()
@@ -29,12 +33,20 @@ ADMIN_ID = "ADMIN_ID"
 # ----------------------------------- START --------------------------------
 @router_admin.message(CommandStart(), Admin(ADMIN_ID))
 async def start(msg: Message):
-    await msg.answer("Assalomu aleykum Admin!\n\nBuyruqlar:\n/id - ID olish\n/broadcast - Userlarda xabar yuborish", reply_markup=menu_admin)
+    await msg.answer("Assalomu aleykum Admin!\n\nBuyruqlar:\n/id - ID olish\n/broadcast - Userlarda xabar yuborish\n/get_db - sqlite ni olish", reply_markup=menu_admin)
+
+# ----------------------------------- Sqlite olish --------------------------------
+@router_admin.message(Command('get_db'))
+async def get_db(msg: Message, action=ChatAction.UPLOAD_DOCUMENT):
+    db_path = './movies.db'
+    database = FSInputFile(db_path)
+
+    await bot.send_document(chat_id=ADMIN_ID, document=database)
 
 # ----------------------------------- All movies --------------------------------
 @router_admin.message(F.text == 'Barcha kinolar')
 async def all_movies(msg: Message):
-    movies = db_movies.select_movies()
+    movies = await select_movies()
     movies_str = "\n".join([f"Kino IDsi: <b>{movie[0]}</b>, Kino kodi va nomi: <b>{movie[1]} - {movie[2]}</b>" for movie in movies])
     await msg.answer(movies_str, reply_markup=menu_admin)
 
@@ -42,14 +54,13 @@ async def all_movies(msg: Message):
 
 @router_admin.message(F.text == 'Yangi kino qo\'shish')
 async def add_movi_code(msg: Message, state: FSMContext):
-    db_movies.create_table()
     await state.set_state(Movies.movi_code)
     await msg.answer("Kino kodini yuboring!")
 
 @router_admin.message(Movies.movi_code)
 async def movi_code_set(msg: Message, state: FSMContext):
     movi_code = msg.html_text
-    movie = db_movies.get_movie_by_code(movi_code)
+    movie = await get_movie_by_code(movi_code)
     
     if movie:
         await msg.answer(f"Bunday kino allaqachon mavjud!\n\nKino kodi: {movie['movi_code']}\nKino nomi: {movie['movi_name']}")
@@ -74,7 +85,7 @@ async def movi_vd_set(msg: Message, state: FSMContext):
     movi_name = data['movi_name']
     movi_vd = data['movi_vd']
     await state.clear()
-    db_movies.add_movies(movi_code, movi_name, movi_vd)
+    await add_movie(movi_code, movi_name, movi_vd)
     await msg.answer("Kino qo'shildi!", reply_markup=menu_admin)
 
 #  ---------------------------------- ID -----------------------------------
@@ -137,7 +148,7 @@ async def send_broadcast_message(msg: Message, state: FSMContext):
     broadcast_type = data.get('broadcast_type')
     caption = msg.text
 
-    users = db_user.select_users()  # Barcha userlarni olish
+    users = await select_users()  # Barcha userlarni olish
     user_ids = [user[1] for user in users]  # User IDlarini olish
 
     if broadcast_type == '1':

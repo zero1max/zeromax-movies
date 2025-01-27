@@ -1,13 +1,9 @@
 from aiogram import Dispatcher , Router, Bot
 from aiogram.enums import ParseMode
-from database.db_movies import Database_Movies
-from database.db_user import Database_Users
 from aiogram.client.default import DefaultBotProperties
 
 TOKEN = "your_token"
 
-db_movies = Database_Movies()
-db_user = Database_Users()
 dp = Dispatcher()
 router_admin = Router()
 router_user = Router()

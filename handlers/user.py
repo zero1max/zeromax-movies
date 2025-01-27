@@ -1,7 +1,9 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import CommandStart
 from aiogram import F
-from loader import router_user, bot, db_movies, db_user
+from loader import router_user, bot
+from database.db_movies import *
+from database.db_user import *
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.markdown import text
@@ -12,18 +14,17 @@ async def start(msg: Message):
     surname = msg.from_user.last_name or ''
     user_id = msg.from_user.id
 
-    db_user.create_table()
-    db_user.add_user(user_id, full_name, surname)
+    await add_user(user_id, full_name, surname)
     
-    await bot.send_animation(user_id, animation='CgACAgIAAxkBAAIBrGaoxqBqE4YW9A9LscFaIYZMG2h5AAI1TgACiWhJSXDiMTkMyvYjNQQ')
+    # await bot.send_animation(chat_id=user_id, animation='CgACAgIAAxkBAAIBrGaoxqBqE4YW9A9LscFaIYZMG2h5AAI1TgACiWhJSXDiMTkMyvYjNQQ')
     await msg.answer(f"Assalomu aleykum {msg.from_user.full_name}!😊")
     await check_subscription(msg)
 
 
 async def check_subscription(message: Message):
-    channel_ids = ["@first_channel", "@second_channel"]  # Kanal username'lari yoki ID'lari
+    channel_ids = ["@zero1max", "@zeromaxs_movies"]  # Kanal username'lari yoki ID'lari
     channel_urls = {
-        "@zero1max_channel": "https://t.me/first_channel",
+        "@zero1max": "https://t.me/zero1max",
         "@zeromaxs_movies": "https://t.me/second_channel"
     }
     user_id = message.from_user.id
@@ -62,13 +63,13 @@ async def check_user(msg: Message):
     await check_users(msg)
 
 async def check_users(message: Message):
-    channel_id = "@first_channel"
+    channel_id = "@zero1max"
     user_id = message.from_user.id
     try:
         member = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
         if member.status != 'left':
             movie_code = message.text
-            movie = db_movies.get_movie_by_code(movie_code)
+            movie = await get_movie_by_code(movie_code)
             
             if movie:
                 if movie.get('movi_vd'):  # `movi_vd` mavjudligini tekshirib ko'ramiz
@@ -84,8 +85,8 @@ async def check_users(message: Message):
                 "<b>Kanallarga obuna bo'lishingizni so'raymiz.</b>\n<b>A'zo bo'lganingizdan so'ng</b> /start <b>buyrug'ini yuboring</b>",
                 reply_markup=InlineKeyboardMarkup(
                     inline_keyboard=[
-                        [InlineKeyboardButton(text="1-kanal", url="https://t.me/first_channel")],
-                        [InlineKeyboardButton(text="2-kanal", url="https://t.me/second_channel")]
+                        [InlineKeyboardButton(text="1-kanal", url="https://t.me/zero1max")],
+                        [InlineKeyboardButton(text="2-kanal", url="https://t.me/zeromaxs_movies")]
                     ]
                 )
             )
