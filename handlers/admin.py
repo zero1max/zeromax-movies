@@ -47,8 +47,17 @@ async def get_db(msg: Message, action=ChatAction.UPLOAD_DOCUMENT):
 @router_admin.message(F.text == 'Barcha kinolar')
 async def all_movies(msg: Message):
     movies = await select_movies()
-    movies_str = "\n".join([f"Kino IDsi: <b>{movie[0]}</b>, Kino kodi va nomi: <b>{movie[1]} - {movie[2]}</b>" for movie in movies])
-    await msg.answer(movies_str, reply_markup=menu_admin)
+    movies_list = [f"Kino IDsi: <b>{movie[0]}</b>, Kino kodi va nomi: <b>{movie[1]} - {movie[2]}</b>" for movie in movies]
+    
+    movies_str = ""
+    for movie in movies_list:
+        if len(movies_str) + len(movie) > 4000: 
+            await msg.answer(movies_str, reply_markup=menu_admin)
+            movies_str = ""  
+        movies_str += movie + "\n"
+    
+    if movies_str: 
+        await msg.answer(movies_str, reply_markup=menu_admin)
 
 # ----------------------------------- ADD movies --------------------------------
 
