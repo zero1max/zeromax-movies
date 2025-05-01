@@ -8,14 +8,23 @@ async def setup_user():
             id INTEGER PRIMARY KEY,
             user_id INTEGER NOT NULL,
             full_name TEXT NOT NULL,
-            surname TEXT NOT NULL
+            username TEXT NOT NULL UNIQUE
         )''')
-        await db.commit()
 
-async def add_user(user_id, full_name, surname):
+
+async def add_user(user_id: int, full_name: str, username: str):
     async with aiosqlite.connect(DATABASE) as db:
-        await db.execute("INSERT INTO users (user_id, full_name, surname) VALUES (?, ?, ?)", (user_id, full_name, surname))
-        await db.commit()
+        # Avval mavjud foydalanuvchini tekshiramiz
+        cursor = await db.execute("SELECT 1 FROM users WHERE username = ?", (username,))
+        user_exists = await cursor.fetchone()
+
+        if not user_exists:
+            await db.execute(
+                "INSERT INTO users (user_id, full_name, username) VALUES (?, ?, ?)",
+                (user_id, full_name, username)
+            )
+            await db.commit()
+
 
 async def select_users():
     async with aiosqlite.connect(DATABASE) as db:
@@ -32,8 +41,8 @@ async def delete_one(user_id, value):
         await db.execute(f"DELETE FROM users WHERE {user_id}=?", (value,))
         await db.commit()
 
-async def update_user(id, user_id, full_name, surname):
+async def update_user(id, user_id, full_name, username):
     async with aiosqlite.connect(DATABASE) as db:
-        await db.execute("UPDATE users SET user_id = ?, full_name = ?, surname = ? WHERE id = ?",
-                         (user_id, full_name, surname, id))
+        await db.execute("UPDATE users SET user_id = ?, full_name = ?, username = ? WHERE id = ?",
+                         (user_id, full_name, username, id))
         await db.commit()

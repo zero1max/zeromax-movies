@@ -8,14 +8,17 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.markdown import text
 
+
 @router_user.message(CommandStart())
 async def start(msg: Message):
     full_name = msg.from_user.full_name
-    surname = msg.from_user.last_name or ''
+    username = msg.from_user.username or ''
     user_id = msg.from_user.id
 
-    await add_user(user_id, full_name, surname)
-    
+    user = await select_user(user_id)
+    if not user:
+        await add_user(user_id, full_name, username)
+
     # await bot.send_animation(chat_id=user_id, animation='CgACAgIAAxkBAAIBrGaoxqBqE4YW9A9LscFaIYZMG2h5AAI1TgACiWhJSXDiMTkMyvYjNQQ')
     await msg.answer(f"Assalomu aleykum {msg.from_user.full_name}!😊")
     await check_subscription(msg)
