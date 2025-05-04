@@ -2,7 +2,7 @@ from aiogram import Dispatcher , Router, Bot
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-TOKEN = "YOUR_BOT_TOKEN"
+TOKEN = "bot_token"
 
 dp = Dispatcher()
 router_admin = Router()
