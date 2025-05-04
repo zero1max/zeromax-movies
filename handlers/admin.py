@@ -33,8 +33,8 @@ class Admin(Filter):
     async def __call__(self, msg: Message):
         return msg.from_user.id in self.admin_ids
 
-ADMIN_PASSWORD = "secret123"
-ADMIN_IDS = [5471452269]
+ADMIN_PASSWORD = "admin_password"
+ADMIN_IDS = ["Admin_ID"]
 
 # ----------------------------------- START --------------------------------
 @router_admin.message(CommandStart(), Admin(ADMIN_IDS))

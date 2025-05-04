@@ -25,10 +25,9 @@ async def start(msg: Message):
 
 
 async def check_subscription(message: Message):
-    channel_ids = ["@zero1max", "@zeromaxs_movies"]  # Kanal username'lari yoki ID'lari
+    channel_ids = ["@chanel_username"]  # Kanal username'lari yoki ID'lari
     channel_urls = {
-        "@zero1max": "https://t.me/zero1max",
-        "@zeromaxs_movies": "https://t.me/second_channel"
+        "@chanel_username": "https://t.me/chanel_link",
     }
     user_id = message.from_user.id
     subscribed_channels = set()  # Obuna bo'lgan kanallar ro'yxati
@@ -55,7 +54,7 @@ async def check_subscription(message: Message):
 
     if not_subscribed_channels:
         await message.answer(
-            "Kanallarga obuna bo'lishingizni so'raymiz.\nObuna bo'lgandan so'ng /start buyrug'ini yuboring!\nIltimos, quyidagi kanallarga obuna bo'ling:👇🏻",
+            "Iltimos, quyidagi kanallarga obuna bo‘ling. Obunadan so‘ng /start buyrug‘ini yuboring.👇🏻",
             reply_markup=markup
         )
     else:
@@ -66,7 +65,7 @@ async def check_user(msg: Message):
     await check_users(msg)
 
 async def check_users(message: Message):
-    channel_id = "@zero1max"
+    channel_id = "@chanel_username"
     user_id = message.from_user.id
     try:
         member = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
@@ -79,7 +78,7 @@ async def check_users(message: Message):
                     await bot.send_video(
                         chat_id=user_id,
                         video=movie['movi_vd'],
-                        caption=f"🎬Kino: <b>{movie['movi_name']}</b>\n📌Kod: <b>{movie['movi_code']}</b>\n\n🤖 Bot: @your_bot_name"
+                        caption=f"🎬Kino: <b>{movie['movi_name']}</b>\n📌Kod: <b>{movie['movi_code']}</b>\n\n🤖 Bot: @bot_username"
                     )
             else:
                 await message.answer("Bunday kod mavjud emas!")
@@ -88,8 +87,7 @@ async def check_users(message: Message):
                 "<b>Kanallarga obuna bo'lishingizni so'raymiz.</b>\n<b>A'zo bo'lganingizdan so'ng</b> /start <b>buyrug'ini yuboring</b>",
                 reply_markup=InlineKeyboardMarkup(
                     inline_keyboard=[
-                        [InlineKeyboardButton(text="1-kanal", url="https://t.me/zero1max")],
-                        [InlineKeyboardButton(text="2-kanal", url="https://t.me/zeromaxs_movies")]
+                        [InlineKeyboardButton(text="1-kanal", url="https://t.me/chanel_link")]
                     ]
                 )
             )
